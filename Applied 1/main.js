@@ -224,8 +224,7 @@ const tripleAndFilterOdds = (array) => {
   //     }
   // }
   // return newArray;
-  return array.map((item) => ((item * 3 % 2) !== 0) ? item * 3 : undefined)
-
+  return array.map((item) => item * 3).filter((item) => item % 2 !==0);
 }
 
 const countOddNumbers = (array) => {
@@ -236,6 +235,7 @@ const countOddNumbers = (array) => {
   //   }
   // }
   // return count;
+  return array.reduce((count, item) => (item % 2 !== 0) ? count + 1 : count , 0)
 }
 
 /*****************************************************************
@@ -252,12 +252,19 @@ const countOddNumbers = (array) => {
  * @param n Target value
  * @returns Array of integers in the range [0, n)
  */
-const range = IMPLEMENT_THIS;
+const range = (n) => {
+  const arr = [];
+  for (let i = 0; i < n; i++){arr.push(i)}
+  return arr;
+};
 
 /**
  * @returns Answer to project euler problem 1
  */
-const projectEulerProblem1Again = () => IMPLEMENT_THIS;
+const projectEulerProblem1Again = () => 
+{
+  return range(1000).reduce((acc, num) => (num % 3 === 0 | num % 5 === 0 ) ? acc + num : acc, 0);
+};
 
 /*****************************************************************
  * Exercise 7:
