@@ -29,6 +29,9 @@ const IMPLEMENT_THIS = undefined;
  *  and initialise its value to firstConst + 1.
  */
 
+const firstConst = 1;
+const secondConst = firstConst + 1;
+
 /*****************************************************************
  * Exercise 2:
  *
@@ -41,6 +44,17 @@ const IMPLEMENT_THIS = undefined;
  *  - anonymousFunction: using an anonymous function declared with the "function" keyword
  *  - arrowFunction: using an arrow function
  */
+function aFunction() {
+  const locVariable = 2;
+  return locVariable ** 2;
+}
+
+const anonymousFunction = function () {
+  const locvar = 2;
+  return locvar ** 2;
+}
+
+const arrowFunction = x => 4;
 
 /*****************************************************************
  * Exercise 3:
@@ -60,8 +74,9 @@ const IMPLEMENT_THIS = undefined;
  * @param x Number to check
  * @returns True if x is divisible by three or five, false otherwise
  */
-const isDivisibleByThreeOrFive = IMPLEMENT_THIS;
-
+const isDivisibleByThreeOrFive = function (x) {
+  return (x % 3 === 0) || (x % 5 === 0);
+}
 /**
  * Sum up to a specified number, ignoring values.
  *
@@ -72,8 +87,14 @@ const isDivisibleByThreeOrFive = IMPLEMENT_THIS;
  * @returns the sum
  */
 const selectiveSummer = (f) => (n) => {
-  const summer_aux = IMPLEMENT_THIS;
-
+  const summer_aux = (n) => {
+    if (n) {
+      return f(n) ? n + summer_aux(n - 1) : summer_aux(n - 1);
+    }
+    else {
+      return 0;
+    }
+  }
   return summer_aux(n);
 };
 
@@ -85,12 +106,14 @@ const selectiveSummer = (f) => (n) => {
  * @param n Target number
  * @returns The sum of numbers up to but not including n that are divisible by three or five
  */
-const filteredSum = (n) => IMPLEMENT_THIS;
+const filteredSum = (n) => {
+  return selectiveSummer(isDivisibleByThreeOrFive)(n - 1)
+};
 
 /**
  * @returns Answer to project euler problem 1
  */
-const projectEulerProblem1 = () => IMPLEMENT_THIS(1000);
+const projectEulerProblem1 = () => filteredSum(1000);
 
 /*****************************************************************
  * Exercise 4:
@@ -106,7 +129,9 @@ const projectEulerProblem1 = () => IMPLEMENT_THIS(1000);
  *
  * @param arr Array to print
  */
-const printArray = IMPLEMENT_THIS;
+const printArray = (arr) => {
+  arr.forEach(function (item) { console.log(item) })
+};
 
 /**
  * Create a new array with each item incremented by one (1)
@@ -114,7 +139,13 @@ const printArray = IMPLEMENT_THIS;
  * @param arr Array to increment
  * @returns New array with incremented items
  */
-const addOne = IMPLEMENT_THIS;
+const addOne = (arr) => {
+  let newArray = []
+  arr.forEach(function (item) {
+    newArray.push(item + 1)
+  })
+  return newArray
+};
 
 /**
  * Create a new array with ones removed
@@ -122,7 +153,13 @@ const addOne = IMPLEMENT_THIS;
  * @param arr Input array
  * @returns Array without ones
  */
-const removeOnes = IMPLEMENT_THIS;
+const removeOnes = (arr) => {
+  let newArray = [];
+  arr.forEach(function (item) {
+    if (item != 1) newArray.push(item);
+  })
+  return newArray;
+};
 
 /**
  * Calculate the sum of the items in an array
@@ -130,7 +167,13 @@ const removeOnes = IMPLEMENT_THIS;
  * @param arr Input array
  * @returns Sum of items in arr
  */
-const sumArray = IMPLEMENT_THIS;
+const sumArray = (arr) => {
+  let sum = 0;
+  arr.forEach(function (item) {
+    sum += item;
+  })
+  return sum;
+};
 
 /*****************************************************************
  * Exercise 5:
@@ -140,53 +183,59 @@ const sumArray = IMPLEMENT_THIS;
  */
 
 const multiplyArray = (n, array) => {
-  let newArray = []
-  for (let i = 0; i < array.length; i++) {
-    newArray.push(array[i] * n)
-  }
-  return newArray
+  // let newArray = []
+  // for (let i = 0; i < array.length; i++) {
+  //   newArray.push(array[i] * n)
+  // }
+  // return newArray
+
+  return array.map((x) => x * n)
 }
 
 const filterEvenNumbers = (array) => {
-  let newArray = [];
-  for (let i = 0; i < array.length; i++) {
-      if (array[i] % 2 === 0) {
-          newArray.push(array[i]);
-      }
-  }
-  return newArray;
+  // let newArray = [];
+  // for (let i = 0; i < array.length; i++) {
+  //     if (array[i] % 2 === 0) {
+  //         newArray.push(array[i]);
+  //     }
+  // }
+  // return newArray;
+  return array.filter((x) => x % 2 === 0);
 }
 
 // Do *not* use Math.max
 const findMax = (array) => {
-  let max = array[0];
-  for (let i = 1; i < array.length; i++) {
-      if (array[i] > max) {
-          max = array[i];
-      }
-  }
-  return max;
+  // let max = array[0];
+  // for (let i = 1; i < array.length; i++) {
+  //     if (array[i] > max) {
+  //         max = array[i];
+  //     }
+  // }
+  // return max;
+  return array.reduce((acc, item) => acc < item ? item : acc)
 }
 
 const tripleAndFilterOdds = (array) => {
-  let newArray = [];
-  for (let i = 0; i < array.length; i++) {
-      let tripled = array[i] * 3;
-      if (tripled % 2 !== 0) {
-          newArray.push(tripled);
-      }
-  }
-  return newArray;
+  // let newArray = [];
+  // for (let i = 0; i < array.length; i++) {
+  //     let tripled = array[i] * 3;
+  //     if (tripled % 2 !== 0) {
+  //         newArray.push(tripled);
+  //     }
+  // }
+  // return newArray;
+  return array.map((item) => ((item * 3 % 2) !== 0) ? item * 3 : undefined)
+
 }
 
 const countOddNumbers = (array) => {
-  let count = 0;
-  for (let i = 0; i < array.length; i++) {
-    if (array[i] % 2 !== 0) {
-      count++;
-    }
-  }
-  return count;
+  // let count = 0;
+  // for (let i = 0; i < array.length; i++) {
+  //   if (array[i] % 2 !== 0) {
+  //     count++;
+  //   }
+  // }
+  // return count;
 }
 
 /*****************************************************************
