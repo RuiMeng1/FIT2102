@@ -288,7 +288,7 @@ const projectEulerProblem1Again = () =>
  * @returns Cons list, function in closure
  */
 function cons(head, rest = null) {
-  return (selector) => IMPLEMENT_THIS;
+  return (selector) => selector(head,rest);
 }
 
 /**
@@ -300,7 +300,7 @@ function cons(head, rest = null) {
 function head(list) {
   if (!list) throw new TypeError("list is null");
 
-  return list(IMPLEMENT_THIS);
+  return list((head,rest) => head);
 }
 
 /**
@@ -312,7 +312,7 @@ function head(list) {
 function rest(list) {
   if (!list) throw new TypeError("list is null");
 
-  return list(IMPLEMENT_THIS);
+  return list((head,rest) => rest);
 }
 
 /*****************************************************************
@@ -334,9 +334,9 @@ function rest(list) {
  * @param list Cons list
  */
 function forEach(f, list) {
-  if (list) {
-    f(head(list));
-    forEach(f, rest(list));
+  if (list){
+  f(head(list));
+  forEach(f,rest(list));
   }
 }
 
@@ -349,10 +349,8 @@ function forEach(f, list) {
  */
 function map(f, list) {
   if (!list) return null;
-
-  return IMPLEMENT_THIS;
+  return cons(f(head(list)), map(f, rest(list)));
 }
-
 /**
  * Reduce for cons list
  *
@@ -363,8 +361,7 @@ function map(f, list) {
  */
 function reduce(f, acc, list) {
   if (!list) return acc;
-
-  return IMPLEMENT_THIS;
+  return reduce(f,f(acc,head(list)),rest(list));
 }
 
 /**
@@ -376,9 +373,7 @@ function reduce(f, acc, list) {
  */
 function filter(f, list) {
   if (!list) return null;
-
-  // Skip value
-  if (!f(head(list))) return IMPLEMENT_THIS;
-
-  return IMPLEMENT_THIS;
+  if (!f(head(list))) return filter(f,rest(list));
+  else return cons(head(list), filter(f, rest(list)));
 }
+
