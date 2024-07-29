@@ -58,6 +58,13 @@ const outputText = (targetDiv: string, text: string) =>
  * see: https://tgdwyer.github.io/typescript1/#using-the-compiler-to-ensure-immutability
  */
 
+const anObject = {
+  x: 5
+}
+const anotherObject = {
+  ...anObject,
+  y: 10
+}
 /*****************************************************************
  * Exercise 2
  *
@@ -73,10 +80,11 @@ const outputText = (targetDiv: string, text: string) =>
 
 // Define an animation function
 function animate(
-  rect: IMPLEMENT_THIS,
-  startX: IMPLEMENT_THIS,
-  finalX: IMPLEMENT_THIS,
-  duration: IMPLEMENT_THIS,
+  rect: HTMLElement,
+
+  startX: number,
+  finalX: number,
+  duration: number,
 ) {
   const startTime = performance.now();
   function nextFrame() {
@@ -88,7 +96,7 @@ function animate(
     if (elapsedTime >= duration) {
       // Set the final position of the rectangle.
       // We can use `setAttribute` to modify the HTML Element. In this case, we are changing the x attribute.
-      rect.setAttribute("x", finalX);
+      rect.setAttribute("x", String(finalX));
       return; // Stop the animation
     }
 
@@ -96,7 +104,7 @@ function animate(
     const x = startX + ((finalX - startX) * elapsedTime) / duration;
 
     // Set the intermediate position of the rectangle.
-    rect.setAttribute("x", x);
+    rect.setAttribute("x", String(x));
 
     // Call the nextFrame function again after a delay of 1000/60 milliseconds
     setTimeout(nextFrame, 1000 / 60); // 60 FPS
@@ -104,10 +112,12 @@ function animate(
   nextFrame();
 }
 
-const rectangle = document.getElementById("redRectangle");
+const rectangle = document.getElementById("redRectangle")!;
 const duration = 5000; // 5 seconds in milliseconds
 animate(rectangle, 0, 370, duration);
-
+const blueRectangle = document.getElementById("blueRectangle")!;
+const durationBlueRec = 10000; // 10 seconds
+animate(blueRectangle,370,0,duration);
 /*****************************************************************
  * Exercise 3a
  *
@@ -129,12 +139,22 @@ animate(rectangle, 0, 370, duration);
  *
  * /Hint 2/: The `content` field is an *array* of something, what could it be?
  */
-type Todo = IMPLEMENT_THIS;
+type Todo = Readonly<{
+  timestamp: number,
+  from: string,
+  verySecretVerySecureCodeThatDefinitelyDoesNotContainAnythingUseful: string,
+  content: TodoItem[]
+}>;
 
 /**
  * Item in a todo list
  */
-type TodoItem = IMPLEMENT_THIS;
+type TodoItem = Readonly<{
+  userId: number,
+  id: number,
+  title: string,
+  completed: boolean
+}>;
 
 const todo: Todo = {
   timestamp: 65535,
@@ -196,18 +216,20 @@ const todo: Todo = {
  * @param item Todo item
  * @returns Prettified todo item
  */
-const prettifyTodoItem = (item: TodoItem): string => IMPLEMENT_THIS;
+const prettifyTodoItem = (item: TodoItem): string => 
+  `userId: ${item.userId} | id: ${item.id} | title: ${item.title} | completed: ${item.completed}`;
+
 
 /**
- *
+ * 
  * @param content Collection of todo items
  * @returns Prettified content
  */
 const prettifyContent = (content: ReadonlyArray<TodoItem>): string =>
-  IMPLEMENT_THIS;
+  content.reduce((str, item) => str + prettifyTodoItem(item) + '\n', '');
 
 /**
- *
+ * 
  * @param todo Todo object
  * @returns prettified representation of todo data
  *
@@ -217,7 +239,7 @@ const prettifyContent = (content: ReadonlyArray<TodoItem>): string =>
  * /Hint 2/: Object destructuring can be used in the arguments
  *  e.g. ({ someKey }) => someKey
  */
-const prettifyTodo = (todo: Todo): string => IMPLEMENT_THIS;
+const prettifyTodo = (todo: Todo): string =>`timestamp: ${todo.timestamp} \nfrom: ${todo.from}\ncontent:\n` + prettifyContent(todo.content);
 
 outputText("pretty_object_output", prettifyTodo(todo).toString());
 
@@ -236,9 +258,9 @@ outputText("pretty_object_output", prettifyTodo(todo).toString());
  */
 
 type BinaryTree<T> = Readonly<{
-  data: IMPLEMENT_THIS;
-  left?: IMPLEMENT_THIS;
-  right?: IMPLEMENT_THIS;
+  data: T;
+  left?: BinaryTree<T>;
+  right?: BinaryTree<T>;
 }>;
 
 /**
@@ -256,11 +278,15 @@ type BinaryTree<T> = Readonly<{
  * @param right Right child
  * @returns Binary tree node
  */
-const binaryTree = (
-  data: IMPLEMENT_THIS,
-  left?: IMPLEMENT_THIS,
-  right?: IMPLEMENT_THIS,
-): BinaryTree<IMPLEMENT_THIS> => IMPLEMENT_THIS;
+const binaryTree = <T> (
+  data: T,
+  left?: BinaryTree<T>,
+  right?: BinaryTree<T>,
+): BinaryTree<T> => ({
+  data,
+  left,
+  right
+});
 
 const binaryTreeExample = binaryTree(
   1,
@@ -303,13 +329,13 @@ const binaryTreeExample = binaryTree(
  * @param node Root node of binary tree
  * @returns Prettified binary tree
  */
-function prettifyBinaryTree<T>(node: BinaryTree<T>): string {
-  const current = String(node.data);
+function prettifyBinaryTree<T>(node: BinaryTree<T>, depth = 0): string {
+  const current = "|- ".repeat(depth) + String(node.data);
 
-  const left = IMPLEMENT_THIS;
-  const right = IMPLEMENT_THIS;
+  const left = node.left? prettifyBinaryTree(node.left, depth + 1): "";
+  const right = node.right? prettifyBinaryTree(node.right, depth + 1): "";
 
-  return IMPLEMENT_THIS;
+  return `${current}\n${left}${right}`;
 }
 
 const prettyBinaryTree = prettifyBinaryTree(binaryTreeExample);
@@ -323,12 +349,12 @@ outputText("pretty_btree_output", prettyBinaryTree);
  */
 
 type NaryTree<T> = Readonly<{
-  data: IMPLEMENT_THIS;
-  children: IMPLEMENT_THIS;
+  data: T;
+  children: NaryTree<T>[];
 }>;
 
-const naryTree = <T>(data: IMPLEMENT_THIS, children: IMPLEMENT_THIS = []) =>
-  IMPLEMENT_THIS;
+const naryTree = <T>(data: T, children: NaryTree<T>[] = []) =>
+  ({data, children});
 
 const naryTreeExample = naryTree(1, [
   naryTree(2),
@@ -369,10 +395,10 @@ const naryTreeExample = naryTree(1, [
  * @param node Root of Nary tree
  * @returns Prettified Nary tree
  */
-function prettifyNaryTree<T>(node: NaryTree<T>): string {
-  const current = String(node.data);
+function prettifyNaryTree<T>(node: NaryTree<T>, depth = 0): string {
+  const current = "|- ".repeat(depth) + String(node.data);
 
-  const children = IMPLEMENT_THIS;
+  const children = node.children.map((item) => item ? prettifyNaryTree(item, depth + 1): "");
 
   return [current, ...children].filter(Boolean).join("\n");
 }
