@@ -129,7 +129,7 @@ const join : <T>(l:ConsList<ConsList<T>>) => ConsList<T>
     //         return null;
     //     }
     // };
-     l ? concat(head(l))(join(l)): null;
+     l ? concat(head(l))(join(rest(l))): null;
 
 /** ======= EXERCISE 7 =============================
  * Apply a function that returns a list to elements of the list l, 
