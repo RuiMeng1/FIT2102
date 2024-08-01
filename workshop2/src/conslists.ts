@@ -87,19 +87,28 @@ const deepEqual : <T>(a:ConsList<T>) => (b:ConsList<T>) => boolean
  */
 const map : <T,U>(f:(_:T)=>U) => (l:ConsList<T>) => ConsList<U>
     = f => l => 
-    //     {
-    //             if (l) { return cons(f(head(l)), map(f)(rest(l)));}
-    //             else {return null;};
-    // }
-    l ?  
+                l ? cons(f(head(l)), map(f)(l)) : null;
 /** ======= EXERCISE 5 =============================
  * Put the concatenated contents of two lists into a new list
  * @param list1 First list
  * @param list2 Second list
  */
 const concat : <T>(l1:ConsList<T>)=>(l2:ConsList<T>) => ConsList<T> 
-    = IMPLEMENT_THIS
-
+    = l1 => l2 => {
+                    if (l1) {
+                        // if not at end of l1
+                        if(rest(l1)){
+                            return cons(head(l1), concat(rest(l1))(l2));
+                        }
+                        // end of l1
+                        else{
+                            return cons(head(l1),l2) ;
+                        }
+                    }
+                    else{
+                        return l2;
+                    }
+                };
 /** ======= EXERCISE 6 =============================
  * join a list of lists into a flat list
  * @param list1 First list
