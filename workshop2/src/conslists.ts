@@ -86,8 +86,7 @@ const deepEqual : <T>(a:ConsList<T>) => (b:ConsList<T>) => boolean
  * @param l the list
  */
 const map : <T,U>(f:(_:T)=>U) => (l:ConsList<T>) => ConsList<U>
-    = f => l => 
-                l ? cons(f(head(l)), map(f)(l)) : null;
+    = f => l => l ? cons(f(head(l)), map(f)(rest(l))) : null;
 /** ======= EXERCISE 5 =============================
  * Put the concatenated contents of two lists into a new list
  * @param list1 First list
@@ -111,11 +110,26 @@ const concat : <T>(l1:ConsList<T>)=>(l2:ConsList<T>) => ConsList<T>
                 };
 /** ======= EXERCISE 6 =============================
  * join a list of lists into a flat list
- * @param list1 First list
- * @param list2 Second list
+ * @param l nested list
  */
 const join : <T>(l:ConsList<ConsList<T>>) => ConsList<T> 
-    = IMPLEMENT_THIS
+    = l => 
+    // This solution passes test cases but causes type error ????? wtf  
+    //   {
+    //     if (l) {
+    //         // head a list or single con?
+    //         if(len(head(l)) === 1){ // con
+    //             return cons(head(l), concat(rest(l)));
+    //         }
+    //         else{ // list of cons
+    //             return concat(head(l))(join(rest(l)));
+    //         }
+    //     }
+    //     else{
+    //         return null;
+    //     }
+    // };
+     l ? concat(head(l))(join(l)): null;
 
 /** ======= EXERCISE 7 =============================
  * Apply a function that returns a list to elements of the list l, 
@@ -124,8 +138,8 @@ const join : <T>(l:ConsList<ConsList<T>>) => ConsList<T>
  * @param f a function that takes a T and returns a list of U
  * @returns a list of U
  */
-const concatMap 
-  : <T,U>(f: (_:T)=>ConsList<U>) => (l:ConsList<T>) => ConsList<U>
-  = IMPLEMENT_THIS
+const concatMap : <T,U>(f: (_:T)=>ConsList<U>) => (l:ConsList<T>) => ConsList<U>
+  = f => l => 
+    l ? concat(f(head(l)))(concatMap(f)(rest(l))) : null;
 
 export { cons, ConsList, len, forEach, concatMap, head, rest, fromArray, deepEqual, map, concat, join, toArray }
