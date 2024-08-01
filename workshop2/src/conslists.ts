@@ -60,7 +60,8 @@ function forEach<T>(f: (_:T)=>void, list:ConsList<T>): void {
  * @param list 
  */
 const len : <T>(list:ConsList<T>) => number 
-          = IMPLEMENT_THIS
+          = list => list ? 1 + len(rest(list)) : 0;
+
 
 /** ======= EXERCISE 3 =============================
  * Check if two lists are deeply equal
@@ -68,16 +69,29 @@ const len : <T>(list:ConsList<T>) => number
  * @param list2 Second list
  */
 const deepEqual : <T>(a:ConsList<T>) => (b:ConsList<T>) => boolean
-    = IMPLEMENT_THIS
-
+    = a => b =>
+                /*
+                        Logic:
+                        checks length are equal, then checks if reached the end (both null).
+                        If at end, then all are equal
+                        If not at the end, check if heads are same
+                        recursive call for rest of list
+                */
+                (len(a) === len(b)) ? (a === null && b ===null ? true : (head(a!) === head(b!) ? deepEqual(rest(a!))(rest(b!)) : false)) : false;
+                
+    
 /** ======= EXERCISE 4 =============================
  * map a function over a list
  * @param f the function to map
  * @param l the list
  */
 const map : <T,U>(f:(_:T)=>U) => (l:ConsList<T>) => ConsList<U>
-    = IMPLEMENT_THIS
-
+    = f => l => 
+    //     {
+    //             if (l) { return cons(f(head(l)), map(f)(rest(l)));}
+    //             else {return null;};
+    // }
+    l ?  
 /** ======= EXERCISE 5 =============================
  * Put the concatenated contents of two lists into a new list
  * @param list1 First list
