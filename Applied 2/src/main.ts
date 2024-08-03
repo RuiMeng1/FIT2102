@@ -432,9 +432,15 @@ type jsonTypes =
  * this function to convert their elements into the required format, add
  * indentation, and wrap with brackets.
  */
-const prettifyJson: (json: jsonTypes) => string = (json) => {
-  return IMPLEMENT_THIS;
-};
+const prettifyJson = (json: jsonTypes, depth=1): string => { //depth keeps track of how many spaces for formatting
+  const keyIndent = '  '.repeat(depth) //for formatting
+  const bracketIndent = '  '.repeat(depth-1) //for formatting
+  const out = json == null || ['string', 'boolean', 'number'].includes(typeof(json)) ? String(json) // covers all simple bases cases
+  : Array.isArray(json) ? `[${json.reduce((acc, el) => acc + ',\n' + keyIndent + prettifyJson(el, depth+1))}\n${bracketIndent}]`  //for array case
+  : typeof(json) == 'object' ? `{\n${Object.entries(json).map(([key, val]) => `${keyIndent}${key}: ${prettifyJson(val, depth+1)}`).join(',\n')}\n${bracketIndent}}` //for objects
+  : `${json} is not a jsonType.`
+  return out;
+}
 
 const json = {
   unit: "FIT2102",
