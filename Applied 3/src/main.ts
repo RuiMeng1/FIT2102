@@ -53,7 +53,7 @@ import {
   Observable,
   of,
 } from "rxjs";
-import { concatMap, filter, map, scan, takeUntil, delay } from "rxjs/operators";
+import { concatMap, filter, map, scan, takeUntil, delay, timeInterval } from "rxjs/operators";
 
 // Stub value to indicate an implementation
 const IMPLEMENT_THIS: any = undefined;
@@ -135,10 +135,22 @@ function mousePosObservable() {
 
   // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent
   const source$ = fromEvent<MouseEvent>(document, "mousemove");
-
   source$
-    .pipe(IMPLEMENT_THIS) // This must be pure
-    .subscribe(IMPLEMENT_THIS); // Side effects should be contained here
+    .pipe(
+      map(
+        e=>({
+          x: e.clientX,
+          y: e.clientY
+        })
+      )
+    )// This must be pure
+    .subscribe(
+      ({x,y}) =>
+      {
+        elem.textContent = `${x} , ${y}`;
+        (x>400) ? elem.classList.add("highlight"): elem.classList.remove("highlight");
+      }
+    ); // Side effects should be contained here
 }
 
 /*****************************************************************
@@ -167,15 +179,14 @@ function animatedRect() {
 
   /** Write your code after here */
 
-  const source$ = IMPLEMENT_THIS;
+  const source$ = interval(1);
 
   const move$ = source$
     .pipe(
-      takeUntil(IMPLEMENT_THIS),
-
-      scan(IMPLEMENT_THIS),
+      takeUntil(timer(1000)),
+      scan((currX: number) => currX += 5, 0),
     )
-    .subscribe((newX: IMPLEMENT_THIS) => rect.setAttribute("x", String(newX)));
+    .subscribe((newX: number) => rect.setAttribute("x", String(newX)));
 }
 
 /*****************************************************************
@@ -203,12 +214,15 @@ function animatedRect2() {
   const moveDownRight$ = interval(10)
     .pipe(
       // Stop taking values after some amount of time
-      IMPLEMENT_THIS,
+      takeUntil(timer(1410)),
 
       // Update position of rectangle
-      IMPLEMENT_THIS,
+      scan(({x,y}) => ({
+        x: x+2,
+        y: y+2
+      }), ({x:0, y:0})),
     )
-    .subscribe(({ x, y }: IMPLEMENT_THIS) => {
+    .subscribe(({ x, y }: {x: number, y:number}) => {
       rect.setAttribute("x", String(x));
       rect.setAttribute("y", String(y));
     });
@@ -241,25 +255,25 @@ function keyboardControl() {
    * @returns Observable stream that indicates changes in state for
    *  the particular keypress
    */
-  const fromKey = (keyCode: string, IMPLEMENT_THIS: IMPLEMENT_THIS) =>
+  const fromKey = (keyCode: string, {x, y}: {x:number, y:number}) =>
     key$.pipe(
       filter(({ code }) => code === keyCode),
-      map(() => IMPLEMENT_THIS),
-    );
+      map(() => ({x: x ,y: y})))
+    ;
 
   /**
-   * /Hint/: QW4gb2JqZWN0IGxpa2UgeyBheGlzOiAneCcgfCAneScsIGFtb3VudDogaW50IH0gY2FuIGJlIHVzZWQgdG8gcmVwcmVzZW50IGEgcGFydGljdWxhciBrZXlwcmVzcy4gRS5nLiBQcmVzc2luZyBLZXlBIG1pZ2h0IHByb2R1Y2UgeyBheGlzOiAneCcsIGFtb3VudDogLTEwIH0=
+   * /Hint/: An object like { axis: 'x' | 'y', amount: int } can be used to represent a particular keypress.
+   * E.g. Pressing KeyA might produce { axis: 'x', amount: -10 }
    */
 
   /** Decrease x */
-  const left$ = fromKey("KeyA", IMPLEMENT_THIS);
+  const left$ = fromKey("KeyA", {x: -10, y: 0});
   /** Decrease y */
-  const up$ = fromKey("KeyW", IMPLEMENT_THIS);
+  const up$ = fromKey("KeyW", {x: 0, y: -10});
   /** Increase x */
-  const right$ = fromKey("KeyD", IMPLEMENT_THIS);
+  const right$ = fromKey("KeyD", {x: 10, y: 0});
   /** Increase y */
-  const down$ = fromKey("KeyS", IMPLEMENT_THIS);
-
+  const down$ = fromKey("KeyS", {x: 0, y: 10});
   /**
    * /Hint/: What operator can we use to merge observables?
    *         Have a look through the operators we covered in the
@@ -268,9 +282,14 @@ function keyboardControl() {
    * /Hint 2/: This should make use of the scan function
    */
 
-  IMPLEMENT_THIS(left$, down$, up$, right$)
-    .pipe()
-    .subscribe(({ x, y }: IMPLEMENT_THIS) => {
+  merge(left$, down$, up$, right$)
+    .pipe(
+      scan(({x,y}, {x: dx, y: dy}) => ({
+        x: x+dx,
+        y: y+dy
+      }))
+  )
+    .subscribe(({ x, y }: {x:number, y:number}) => {
       rect.setAttribute("x", String(x));
       rect.setAttribute("y", String(y));
     });
@@ -287,19 +306,23 @@ function keyboardControl() {
  */
 
 function printWithDelay() {
-  // This fetches the csv from your computer and converts it to a string
-  fetch("http://localhost:5173/src/data.csv")
-    .then((response) => response.text())
-    .then((text) => process(text));
-
-  const process = (text: string) => {
-    // Do something with each line
-    const lines = text.split("\n");
-  };
+  // TODO: FINISH LATER
+  // // This fetches the csv from your computer and conve
+  // fetch ("http://localhost: 5173/src/data.csv")
+  //  then ((response) => response.text())
+  //  then ( (text) => process (text) );
+  // const process = (text: string) 
+  // // Do something with each line
+  // const lines = text.split("\n");
+  // Lines. forEach(line - E
+  // const [delay, word] = line split(",");
+  // • const timer$ = timer (Number (delay) ); timer$. subscribe (console.log) :
 }
+
 /**
  * Do Not Modify
  */
+
 document.addEventListener("DOMContentLoaded", function (event) {
   mousePosEvents();
   mousePosObservable();

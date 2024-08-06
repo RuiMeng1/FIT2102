@@ -226,7 +226,8 @@ const prettifyTodoItem = (item: TodoItem): string =>
  * @returns Prettified content
  */
 const prettifyContent = (content: ReadonlyArray<TodoItem>): string =>
-  content.reduce((str, item) => str + prettifyTodoItem(item) + '\n', '');
+  // content.reduce((str, item) => str + prettifyTodoItem(item) + '\n', '');
+  content.map(prettifyTodoItem).join("\n")
 
 /**
  * 
