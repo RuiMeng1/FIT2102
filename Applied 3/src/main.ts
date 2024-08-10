@@ -302,23 +302,23 @@ function keyboardControl() {
  * This code shall console.log a string (second column)
  * after a specified delay (first column)
  *
- *
  */
-
 function printWithDelay() {
-  // TODO: FINISH LATER
-  // // This fetches the csv from your computer and conve
-  // fetch ("http://localhost: 5173/src/data.csv")
-  //  then ((response) => response.text())
-  //  then ( (text) => process (text) );
-  // const process = (text: string) 
-  // // Do something with each line
-  // const lines = text.split("\n");
-  // Lines. forEach(line - E
-  // const [delay, word] = line split(",");
-  // • const timer$ = timer (Number (delay) ); timer$. subscribe (console.log) :
-}
+  // This fetches the csv from your computer and converts it to a string
+  fetch("http://localhost:5173/src/data.csv")
+    .then((response) => response.text())
+    .then((text) => process(text));
 
+  const process = (text: string) => {
+    const lines = text.split("\n");
+    lines.forEach((line) =>
+      { const [delay, word] = line.split(",");
+        const timer$ = timer(Number(delay));
+        timer$.subscribe(() => console.log(word));
+      }
+    );
+  };
+}
 /**
  * Do Not Modify
  */
