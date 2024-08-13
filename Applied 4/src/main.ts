@@ -71,7 +71,7 @@ abstract class RNG {
  *
  * /Hint/: An RNG stream will need to accumulate state to produce a stream of random values.
  *
- * /Hint 2/: VXNlIHNjYW4=
+ * /Hint 2/: Use scan
  *
  * /Challenge/: Implement this using a lazy sequence of random numbers.
  * It is interesting and more generally useful than just a stream.
@@ -88,11 +88,11 @@ abstract class RNG {
  * @param seed The seed for the random number generator
  */
 export function createRngStreamFromSource<T>(source$: Observable<T>) {
-    return function createRngStream(
-        seed: number = 0,
-    ): Observable<IMPLEMENT_THIS> {
-        const randomNumberStream = source$.pipe(IMPLEMENT_THIS);
-
+    return function createRngStream(seed: number = 0,): Observable<number> {
+        const randomNumberStream = source$.pipe(
+            scan((e) => RNG.hash(e), seed),
+            map(RNG.scale)
+        );
         return randomNumberStream;
     };
 }
@@ -163,19 +163,23 @@ function piApproximation() {
     const resetCanvas = () => {
         canvas.querySelectorAll("[name=circle]").forEach((x) => x.remove());
     };
-
     /** Write your code from here */
-
     /** State data
-     *
-     * /Hint/: State V2Ugd2lsbCBuZWVkIHRvIHN0b3JlIGEgY291bnQgb2YgZG90cyBpbnNpZGUgdGhlIGNpcmNsZSBhbmQgdGhlIHRvdGFsIG51bWJlciBvZiBkb3RzIHRoYXQgd2VyZSBjcmVhdGVkLg==
+     * /Hint/: State We will need to store a count of dots inside the circle and the total number of dots that were created.
      */
     type Data = Readonly<{
         dot?: Dot; // May be initialised without a dot
-        IMPLEMENT_THIS: IMPLEMENT_THIS; // Add additional props as you see fit
+        outsideCount: number; 
+        insideCount: number;
     }>;
 
     const rngStream = createRngStreamFromSource(interval(50));
+
+    const rngStream1 = rngStream(7);
+    const rngStream2 = rngStream(9);
+
+    //const createDot = zip(rngStream1, rngStream2).pipe(map(x => inCircle(x[0], x[1]) ? ({x:x[0], y:[0], colour: 'green'}) : ({x:x[0], y:[0], colour: 'red'})));
+  
 
     /**
      * /Hint/: We want TWO random values per dot - one for x and one for y
@@ -187,12 +191,23 @@ function piApproximation() {
      *
      * /Hint 4/: Observable stream operators V2hhdCBkb2VzIHppcCBhbmQgc2NhbiBkbz8gQ2FuIHdlIHVzZSB0aGVtIHRvIGdldCAyIHJhbmRvbSB2YWx1ZXMgcGVyIGRvdCBhbmQgY291bnQgdGhlIGRvdHMgdGhhdCBoYXZlIGJlZW4gZ2VuZXJhdGVkPwpNYWtlIHN1cmUgdG8gdXNlIHRoZSBEb3QgdHlwZSB0aGF0IGhhcyBiZWVuIHByb3ZpZGVkIQ==
      */
-    const dot$ = IMPLEMENT_THIS.pipe(IMPLEMENT_THIS).subscribe(
-        // You may need to destructure more fields here
-        ({ dot }: IMPLEMENT_THIS) => {
-            if (dot) IMPLEMENT_THIS;
-            resultInPage.textContent = String(IMPLEMENT_THIS);
-        },
+    const dot$ = zip(rngStream1, rngStream2).pipe(
+        map(([x, y]) => inCircle(x, y)
+            ? { x, y, colour: 'green' as Colour }
+            : { x, y, colour: 'red' as Colour }
+        ),
+        scan((acc: Data, dot) => ({
+            dot,
+            insideCount: dot.colour === 'green' ? acc.insideCount + 1 : acc.insideCount,
+            outsideCount: dot.colour === 'red' ? acc.outsideCount + 1 : acc.outsideCount,
+        }), { dot: undefined, outsideCount: 0, insideCount: 0 })
+    );
+
+    dot$.subscribe(
+        ({ dot, insideCount, outsideCount }) => {
+            if (dot) addDotToCanvas(dot);
+            resultInPage.textContent = String(approximatePi(insideCount, insideCount + outsideCount));
+        }
     );
 }
 
@@ -216,3 +231,8 @@ document.addEventListener("DOMContentLoaded", function (event) {
     }
 });
 
+const Reset = document.createElement('button');
+Reset.textContent = 'Reset';
+document.body.appendChild(Reset);
+
+Reset.addEventListener('click')
