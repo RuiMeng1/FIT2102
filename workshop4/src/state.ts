@@ -80,7 +80,7 @@ class Teleport implements Action {
      */
     apply(s: State): State {
         // unit vector in direction scaled
-        const addThis = s.ship.pos.scale(200);
+        const addThis = s.ship.pos.unitVecInDirection(s.ship.angle).;
         return ({
             ...s,ship:{...s.ship, pos: s.ship.pos.add(addThis)}
         })
