@@ -213,6 +213,14 @@ function piApproximation() {
         }
     );
 
+
+    // exercise 3
+    const button = document.getElementById('resetButton');
+    if (button){
+    fromEvent(button,'click').subscribe(() => {
+        resetCanvas();
+    })
+}
 }
 
 /*****************************************************************
@@ -235,18 +243,6 @@ document.addEventListener("DOMContentLoaded", function (event) {
     }
 });
 
-// had to take this out of piapproximation
-const resetCanvas = () => {
-    const canvas = document.getElementById("piApproximationVis")!;
-    canvas.querySelectorAll("[name=circle]").forEach((x) => x.remove());
-};
-
-const button = document.getElementById('resetButton');
-if (button){
-    fromEvent(button,'click').subscribe(() => {
-        resetCanvas();
-    })
-}
 
 
 

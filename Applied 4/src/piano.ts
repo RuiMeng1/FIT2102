@@ -1,5 +1,5 @@
-import { fromEvent, merge, Observable, timer } from "rxjs";
-import { map, mergeMap, startWith, take } from "rxjs/operators";
+import { fromEvent, merge, Observable, timer, from, of } from "rxjs";
+import { flatMap, map, mergeMap, startWith, take } from "rxjs/operators";
 import * as Tone from "tone";
 import { SampleLibrary } from "./tonejs-instruments";
 
@@ -40,23 +40,37 @@ type IMPLEMENT_THIS = any;
  * Do *not* use the ! operator to handle nulls.
  * Do *not* use the filter, operation, but play around with flatMap.
  *
- * /Hint/: ZmxhdE1hcCB3aWxsIGJlIHRoZSBmdW5jdGlvbiB0byB1c2U
+ * /Hint/: flatMap will be the function to use (i think flatMap is same as mergeMap??)
  */
 
 export function getAllElements(): readonly HTMLElement[] {
-    const range = (n: number) => [...Array(n)].map((_, idx) => idx);
+
+    const range = (n: number) => [...Array(n)].map((_, idx) => idx); // number[]
 
     const bRange = range(11)
         .map((x) => x + 1)
         .map((x) => `b${x}`);
-    const wRange = range(16)
+    const wRange = range(16) 
         .map((x) => x + 1)
         .map((x) => `w${x}`);
 
     // Element IDs of all black and white keys
-    const allIds = bRange.concat(wRange);
+    const allIds = bRange.concat(wRange); // string[]
 
-    return IMPLEMENT_THIS;
+    const element$ = from(allIds).pipe(
+        mergeMap(
+            (id) => of(document.getElementById(id))
+        )
+    )
+
+    const elementList: HTMLElement[] = [];
+
+    element$.subscribe((element) =>
+        {if (element) {
+            elementList.push(element)
+        }}
+    )
+    return elementList;
 }
 
 /*****************************************************************
@@ -84,9 +98,8 @@ type MouseUpDownEvent = Readonly<{
     element: HTMLElement;
 }>;
 
-export function mergeUpDown(
-    element: HTMLElement,
-): Observable<MouseUpDownEvent> {
+export function mergeUpDown(element: HTMLElement,): Observable<MouseUpDownEvent> {
+    
     return IMPLEMENT_THIS;
 }
 
