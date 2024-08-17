@@ -176,24 +176,11 @@ function piApproximation() {
         insideCount: number;
     }>;
 
-    const rngStream = createRngStreamFromSource(interval(50));
+    const rngStream = createRngStreamFromSource(interval(1000));
 
     const rngStream1 = rngStream(7);
     const rngStream2 = rngStream(9);
 
-    //const createDot = zip(rngStream1, rngStream2).pipe(map(x => inCircle(x[0], x[1]) ? ({x:x[0], y:[0], colour: 'green'}) : ({x:x[0], y:[0], colour: 'red'})));
-  
-
-    /**
-     * /Hint/: We want TWO random values per dot - one for x and one for y
-     *
-     * /Hint 2/: What state to we need to keep track of (accumulate)?
-     *
-     * /Hint 3/: Rng streams with a different initial seeds should
-     *  produce completely different random values streams
-     *
-     * /Hint 4/: Observable stream operators V2hhdCBkb2VzIHppcCBhbmQgc2NhbiBkbz8gQ2FuIHdlIHVzZSB0aGVtIHRvIGdldCAyIHJhbmRvbSB2YWx1ZXMgcGVyIGRvdCBhbmQgY291bnQgdGhlIGRvdHMgdGhhdCBoYXZlIGJlZW4gZ2VuZXJhdGVkPwpNYWtlIHN1cmUgdG8gdXNlIHRoZSBEb3QgdHlwZSB0aGF0IGhhcyBiZWVuIHByb3ZpZGVkIQ==
-     */
     const dot$ = zip(rngStream1, rngStream2).pipe(
         map(([x, y]) => inCircle(x, y)
             ? { x, y, colour: 'green' as Colour }
@@ -203,7 +190,7 @@ function piApproximation() {
             dot,
             insideCount: dot.colour === 'green' ? acc.insideCount + 1 : acc.insideCount,
             outsideCount: dot.colour === 'red' ? acc.outsideCount + 1 : acc.outsideCount,
-        }), { dot: undefined, outsideCount: 0, insideCount: 0 })
+        }), { dot: undefined, outsideCount: 0, insideCount: 0 }) 
     );
 
     dot$.subscribe(
@@ -215,12 +202,13 @@ function piApproximation() {
 
 
     // exercise 3
-    const button = document.getElementById('resetButton');
-    if (button){
-    fromEvent(button,'click').subscribe(() => {
-        resetCanvas();
-    })
-}
+    const resetButton = document.getElementById('resetButton') as HTMLElement;
+    const resetPress = fromEvent<MouseEvent>(resetButton, 'mousedown');
+    resetPress.subscribe(
+        resetCanvas
+
+    )
+
 }
 
 /*****************************************************************
