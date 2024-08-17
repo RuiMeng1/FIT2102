@@ -30,7 +30,7 @@
 import "./style.css";
 
 import { filter, map, scan, tap } from "rxjs/operators";
-import { fromEvent, interval, merge, zip } from "rxjs";
+import { from, fromEvent, interval, merge, zip } from "rxjs";
 
 import type { Observable } from "rxjs";
 
@@ -96,6 +96,9 @@ export function createRngStreamFromSource<T>(source$: Observable<T>) {
         return randomNumberStream;
     };
 }
+    /**
+     * Remove all dots from the canvas
+     */
 
 /*****************************************************************
  * Exercise 2
@@ -209,6 +212,7 @@ function piApproximation() {
             resultInPage.textContent = String(approximatePi(insideCount, insideCount + outsideCount));
         }
     );
+
 }
 
 /*****************************************************************
@@ -231,8 +235,19 @@ document.addEventListener("DOMContentLoaded", function (event) {
     }
 });
 
-const Reset = document.createElement('button');
-Reset.textContent = 'Reset';
-document.body.appendChild(Reset);
+// had to take this out of piapproximation
+const resetCanvas = () => {
+    const canvas = document.getElementById("piApproximationVis")!;
+    canvas.querySelectorAll("[name=circle]").forEach((x) => x.remove());
+};
 
-Reset.addEventListener('click')
+const button = document.getElementById('resetButton');
+if (button){
+    fromEvent(button,'click').subscribe(() => {
+        resetCanvas();
+    })
+}
+
+
+
+
