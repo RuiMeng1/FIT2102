@@ -29,8 +29,8 @@
 
 import "./style.css";
 
-import { filter, map, scan, tap } from "rxjs/operators";
-import { from, fromEvent, interval, merge, zip, Subject } from "rxjs";
+import { filter, map, scan, takeUntil, tap } from "rxjs/operators";
+import { from, fromEvent, interval, merge, zip } from "rxjs";
 
 import type { Observable } from "rxjs";
 
@@ -166,6 +166,17 @@ function piApproximation() {
     const resetCanvas = () => {
         canvas.querySelectorAll("[name=circle]").forEach((x) => x.remove());
     };
+
+    // exercise 3
+    const resetPi = () => {resultInPage.textContent = 'null'};
+    const resetButton$ = document.getElementById('resetButton') as HTMLElement;
+    const resetPress$ = fromEvent<MouseEvent>(resetButton$, 'mousedown');
+    resetPress$.subscribe(()=> {
+        resetCanvas();
+        resetPi();
+        piApproximation();
+    }
+    )
     /** Write your code from here */
     /** State data
      * /Hint/: State We will need to store a count of dots inside the circle and the total number of dots that were created.
@@ -181,7 +192,8 @@ function piApproximation() {
     const rngStream1 = rngStream(7);
     const rngStream2 = rngStream(9);
 
-    const createDotStream = () => zip(rngStream1, rngStream2).pipe(
+    const dot$ = zip(rngStream1, rngStream2).pipe(
+        takeUntil(resetPress$), // part of exercise 3, we need to end the stream when reset occurs
         map(([x, y]) => inCircle(x, y)
             ? { x, y, colour: 'green' as Colour }
             : { x, y, colour: 'red' as Colour }
@@ -193,28 +205,14 @@ function piApproximation() {
         }), { dot: undefined, outsideCount: 0, insideCount: 0 }) 
     );
 
-    const subscribeToDotStream = () => {
-        createDotStream().subscribe(
+    dot$.subscribe(
         ({ dot, insideCount, outsideCount }) => {
             if (dot) addDotToCanvas(dot);
             resultInPage.textContent = String(approximatePi(insideCount, insideCount + outsideCount));
         }
     );
-    }
 
 
-    subscribeToDotStream(); // initiate stream
-    // exercise 3
-    resetSubject.subscribe(() => {
-        resetCanvas();
-        subscribeToDotStream();
-    })
-
-    const resetButton = document.getElementById('resetButton') as HTMLElement;
-    const resetPress = fromEvent<MouseEvent>(resetButton, 'mousedown');
-    resetPress.subscribe(() =>
-       resetSubject.next()
-    );
 }
 
 /*****************************************************************
@@ -228,7 +226,6 @@ function piApproximation() {
  * achieve the appropriate behaviour.
  *
  */
-const resetSubject = new Subject<void>();
 
 document.addEventListener("DOMContentLoaded", function (event) {
     try {
@@ -237,8 +234,3 @@ document.addEventListener("DOMContentLoaded", function (event) {
         console.log(e);
     }
 });
-
-
-
-
-
