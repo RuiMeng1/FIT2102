@@ -30,7 +30,7 @@
 import "./style.css";
 
 import { filter, map, scan, tap } from "rxjs/operators";
-import { from, fromEvent, interval, merge, zip } from "rxjs";
+import { from, fromEvent, interval, merge, zip, Subject } from "rxjs";
 
 import type { Observable } from "rxjs";
 
@@ -181,7 +181,7 @@ function piApproximation() {
     const rngStream1 = rngStream(7);
     const rngStream2 = rngStream(9);
 
-    const dot$ = zip(rngStream1, rngStream2).pipe(
+    const createDotStream = () => zip(rngStream1, rngStream2).pipe(
         map(([x, y]) => inCircle(x, y)
             ? { x, y, colour: 'green' as Colour }
             : { x, y, colour: 'red' as Colour }
@@ -193,22 +193,28 @@ function piApproximation() {
         }), { dot: undefined, outsideCount: 0, insideCount: 0 }) 
     );
 
-    dot$.subscribe(
+    const subscribeToDotStream = () => {
+        createDotStream().subscribe(
         ({ dot, insideCount, outsideCount }) => {
             if (dot) addDotToCanvas(dot);
             resultInPage.textContent = String(approximatePi(insideCount, insideCount + outsideCount));
         }
     );
+    }
 
 
+    subscribeToDotStream(); // initiate stream
     // exercise 3
+    resetSubject.subscribe(() => {
+        resetCanvas();
+        subscribeToDotStream();
+    })
+
     const resetButton = document.getElementById('resetButton') as HTMLElement;
     const resetPress = fromEvent<MouseEvent>(resetButton, 'mousedown');
-    resetPress.subscribe(
-        resetCanvas
-
-    )
-
+    resetPress.subscribe(() =>
+       resetSubject.next()
+    );
 }
 
 /*****************************************************************
@@ -222,6 +228,7 @@ function piApproximation() {
  * achieve the appropriate behaviour.
  *
  */
+const resetSubject = new Subject<void>();
 
 document.addEventListener("DOMContentLoaded", function (event) {
     try {
