@@ -56,21 +56,9 @@ export function getAllElements(): readonly HTMLElement[] {
 
     // Element IDs of all black and white keys
     const allIds = bRange.concat(wRange); // string[]
-
-    const element$ = from(allIds).pipe(
-        mergeMap(
-            (id) => of(document.getElementById(id))
-        )
-    )
-
-    const elementList: HTMLElement[] = [];
-
-    element$.subscribe((element) =>
-        {if (element) {
-            elementList.push(element)
-        }}
-    )
-    return elementList;
+    const elementsList: HTMLElement[] = allIds.flatMap(
+        (element) => document.getElementById(element) as HTMLElement)
+    return elementsList;
 }
 
 /*****************************************************************
@@ -99,7 +87,16 @@ type MouseUpDownEvent = Readonly<{
 }>;
 
 export function mergeUpDown(element: HTMLElement,): Observable<MouseUpDownEvent> {
-    
+
+    const stream$ = fromEvent(element, 'mousedown');
+    const mouseUp$ = stream$.pipe(
+        mergeMap(
+            (event) => 
+        )
+
+    )
+
+
     return IMPLEMENT_THIS;
 }
 
