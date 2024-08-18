@@ -162,7 +162,7 @@ function main() {
                 samples["piano"].triggerAttack(note,undefined,0.8); // plays note
             }else{
                 timer(1000).subscribe(() =>{
-                    //samples["piano"].triggerRelease(note); // releases note
+                    samples["piano"].triggerRelease(note); // releases note
                     event.element.classList.remove("highlight");
                 })
             }
