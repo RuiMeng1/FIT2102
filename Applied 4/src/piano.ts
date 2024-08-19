@@ -85,8 +85,16 @@ type MouseUpDownEvent = Readonly<{
 }>;
 
 export function mergeUpDown(element: HTMLElement,): Observable<MouseUpDownEvent> {
-    
-    return IMPLEMENT_THIS;
+    const mouseDown$ = fromEvent(element, 'mousedown').pipe(map(()=> ({start: true, element})));
+
+    return mouseDown$.pipe(
+        mergeMap(downEvent =>
+            fromEvent<MouseEvent>(document,'mouseup').pipe(
+                take(1),
+                map(()=> ({start:false , element: downEvent.element}))
+            ).pipe(startWith(downEvent))
+        )
+    );
 }
 
 /*****************************************************************
@@ -142,7 +150,25 @@ function example() {
  *****************************************************************/
 
 function main() {
-    const YOUR_CODE_IN_THIS_FUNCTION = IMPLEMENT_THIS;
+    const elements = getAllElements();
+    
+    elements.forEach((element) => {
+        const mousePress$ = mergeUpDown(element);
+        
+        mousePress$.subscribe(event =>{
+            const note = Tone.Frequency(pianoKeyToMidi(event.element.id), "midi").toNote(); // calculates note
+            if (event.start) {
+                event.element.classList.add("highlight"); // Highlight the key to provide visual feedback.
+                samples["piano"].triggerAttack(note,undefined,0.8); // plays note
+            }else{
+                timer(1000).subscribe(() =>{
+                    samples["piano"].triggerRelease(note); // releases note
+                    event.element.classList.remove("highlight");
+                })
+            }
+        })
+
+    })
 }
 
 export const run = () => {
