@@ -14,7 +14,7 @@
 
 import "./style.css";
 
-import { fromEvent, interval, merge } from "rxjs";
+import { fromEvent, interval, merge, Observable, timer } from "rxjs";
 import { map, filter, scan } from "rxjs/operators";
 import * as Tone from "tone";
 import { SampleLibrary } from "./tonejs-instruments";
@@ -127,7 +127,6 @@ export function main(csv_contents: string) {
     ) as HTMLElement;
 
     /** User input */
-
     const key$ = fromEvent<KeyboardEvent>(document, "keypress");
 
     const fromKey = (keyCode: Key) =>
@@ -238,4 +237,19 @@ if (typeof window !== "undefined") {
                 );
         }
     });
+    function printWithDelay() {
+        // This fetches the csv from your computer and converts it to a string
+        fetch("http://localhost:5173/assets/RockinRobin.csv")
+          .then((response) => response.text())
+          .then((text) => process(text));
+      
+        const process = (text: string) => {
+          const lines = text.split("\n");
+          lines.forEach((line) =>
+            { const IMPLEMENT_THIS = line.split(",");
+                
+            }
+          );
+        };
+      }
 }

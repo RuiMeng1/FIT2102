@@ -174,7 +174,7 @@ function piApproximation() {
     resetPress$.subscribe(()=> {
         resetCanvas();
         resetPi();
-        piApproximation();
+        piApproximation(); // could do this inside merge for streams
     }
     )
     /** Write your code from here */
@@ -187,7 +187,7 @@ function piApproximation() {
         insideCount: number;
     }>;
 
-    const rngStream = createRngStreamFromSource(interval(1000));
+    const rngStream = createRngStreamFromSource(interval(10));
 
     const rngStream1 = rngStream(7);
     const rngStream2 = rngStream(9);

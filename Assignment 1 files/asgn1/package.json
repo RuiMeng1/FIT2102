@@ -1,7 +1,7 @@
 {
     "name": "assignment1",
     "type": "module",
-    "private": true,
+    "private": false,
     "scripts": {
         "test": "vitest",
         "test:ui": "vitest --ui",

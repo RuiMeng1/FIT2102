@@ -1,6 +1,6 @@
 user_played, instrument_name, velocity, pitch, start (s), end (s)
 True,violin,113,67,2.0,2.1666666666666665
-True,violin,113,59,2.0,2.1666666666666665
+True,violin,113,59,2.0,2.1666666666666665 
 True,violin,113,62,2.0,2.1666666666666665
 False,piano,119,35,2.0,2.25
 False,piano,113,46,2.0,2.375
