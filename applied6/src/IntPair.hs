@@ -29,7 +29,7 @@ p3 = IntPair 9 9
 -- >>> minusIntPair p2
 -- 6
 minusIntPair :: IntPair -> Int
-minusIntPair = undefined
+minusIntPair (IntPair a b) = a - b
 
 -- | Return the maximum element in a pair.
 --
@@ -39,11 +39,12 @@ minusIntPair = undefined
 -- >>> maxIntPair p2
 -- 7
 maxIntPair :: IntPair -> Int
-maxIntPair = undefined
+maxIntPair (IntPair a b)= if a > b then a else b
 
 -- | Subtract two pairs together.
 --
 -- >>> subIntPair p1 p2
 -- IntPair (-2) 5
+
 subIntPair :: IntPair -> IntPair -> IntPair
-subIntPair = undefined
+subIntPair (IntPair a b) (IntPair c d) = IntPair (a-c) (b-d)

@@ -26,15 +26,16 @@ one = Node 1 Leaf Leaf
 -- See https://tgdwyer.github.io/haskell2/#pattern-matching
 --
 -- >>> size Leaf
--- 0
---
+-- 1
+
 -- >>> size one
 -- 1
---
+
 -- >>> size tree
--- 4
+
 size :: BinTree a -> Int
-size = undefined
+size Leaf = 0
+size (Node _ b c) = 1 + size b + size c
 
 -- | Find the depth of a tree (number of levels)
 --
@@ -49,7 +50,8 @@ size = undefined
 -- >>> depth tree
 -- 3
 depth :: BinTree a -> Int
-depth = undefined
+depth Leaf = 0
+depth (Node _ b c) = 1 + max (depth b) (depth c)
 
 -- | Map a function over a tree.
 --
@@ -62,7 +64,8 @@ depth = undefined
 -- >>> mapTree (`mod` 2) tree
 -- Node 0 (Node 1 Leaf (Node 1 Leaf Leaf)) (Node 0 Leaf Leaf)
 mapTree :: (a -> b) -> BinTree a -> BinTree b
-mapTree = undefined
+mapTree f Leaf = Leaf
+mapTree f (Node a b c) = Node (f a) (mapTree f b) (mapTree f c)
 
 -- | -----------------------
 -- |  SUPPLEMENTARY CONTENT
