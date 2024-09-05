@@ -13,7 +13,7 @@ type WebSocketMessage = (String, String)
 --
 -- >>> prettyPrintMessage 2 ("GET", "http://example2.com")
 -- "    type: GET\n    link: http://example2.com\n    ----"
---
+
 prettyPrintMessage :: Int -> WebSocketMessage -> String
 prettyPrintMessage indentLevel (msgType, url) =
   replicate (2 * indentLevel) ' ' ++ "type: " ++ msgType ++ "\n" ++
@@ -39,7 +39,10 @@ prettyPrintMessage indentLevel (msgType, url) =
 -- ("GET",[0,1,2,0])
 
 calcIndent :: (String, [Int]) -> WebSocketMessage -> (String, [Int])
-calcIndent (prevType, acc) (msgType, _) = undefined
+calcIndent (prevType, acc) (msgType, _) = 
+  if prevType == msgType
+    then (prevType, acc ++ [maximum acc + 1])
+    else (msgType, acc ++ [0])
 
 
 -- | Function to pretty print an array of WebSocket messages with indentation based on message type
@@ -57,6 +60,8 @@ calcIndent (prevType, acc) (msgType, _) = undefined
 -- [0]
 calculateIndents :: [WebSocketMessage] -> [Int]
 calculateIndents = undefined
+
+
 
 -- | formatOutput generates a string that pretty-prints a list of WebSocket messages
 -- with appropriate indentation based on message types.
