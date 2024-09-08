@@ -48,18 +48,20 @@ calcIndent (prevType, acc) (msgType, _) =
 -- | Function to pretty print an array of WebSocket messages with indentation based on message type
 -- /Hint/ Use foldl to `reduce` across an accumulator of type  (String, [Int])
 -- >>> calculateIndents [("GET", "http://example.com"), ("GET", "http://example2.com"), ("POST", "http://example3.com"), ("POST", "http://example4.com"), ("GET", "http://example5.com")]
--- [0,1,0,1,0]
 --
 -- >>> calculateIndents [("POST", "http://example.com"), ("POST", "http://example2.com"), ("POST", "http://example3.com"), ("GET", "http://example4.com")]
 -- [0,1,2,0]
 --
 -- >>> calculateIndents [("GET", "http://example.com"), ("POST", "http://example2.com"), ("POST", "http://example3.com"), ("GET", "http://example4.com"), ("GET", "http://example5.com")]
--- [0,0,1,0,1]
+-- [0,0,1,0,2]
+
 --
 -- >>> calculateIndents [("GET", "http://example.com")]
 -- [0]
 calculateIndents :: [WebSocketMessage] -> [Int]
-calculateIndents = undefined
+calculateIndents [] = []
+calculateIndents (headMsg:restMsg) = snd $ foldl calcIndent (fst headMsg, [0]) restMsg
+
 
 
 
