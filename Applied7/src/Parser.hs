@@ -47,7 +47,12 @@ int s = case (reads s :: [(Int, String)]) of
 -- >>> (is 'c') "abc"
 -- Nothing
 is :: Char -> String -> Maybe (String, Char)
-is c s = undefined
+is c s = 
+  case char s of
+    Just (rest, x) -> if x == c
+                        then Just (rest, x)
+                        else Nothing
+    Nothing -> Nothing
 
 -- | The 'matches' function checks if two strings match character by character.
 -- If the characters match up to the length of the first string, it returns 'True'.
@@ -68,7 +73,11 @@ is c s = undefined
 -- >>> matches "SOMETHING" ""
 -- False
 matches :: String -> String -> Bool
-matches = undefined
+matches [] _ = True
+matches _ [] = False
+matches a b = all id $ zipWith (==) a b
+
+
 
 -- | Parse a string exactly from the input.
 -- /Hint/ the drop function might be helpful
@@ -82,7 +91,10 @@ matches = undefined
 -- Nothing
 string :: String -> String -> Maybe (String, String)
 string "" s = Just (s, "")
-string expected input = undefined
+string expected input =
+  if matches expected input
+  then Just (drop (length expected) input, expected)
+  else Nothing
 
 -- | Parse the string GET
 -- >>> parseGET "GET /index.html HTTP/1.1"
@@ -91,7 +103,8 @@ string expected input = undefined
 -- >>> parseGET "POST /index.html HTTP/1.1"
 -- Nothing
 parseGET :: String -> Maybe (String, String)
-parseGET = undefined
+parse Nothing = Nothing
+parseGET s = string "GET" s
 
 -- | Parse whitespace function checks if the input string starts with either a space (' ') or a tab ('\t').
 -- If it does, it removes all of the leading whitespace and returns the rest of the string inside a `Just`.

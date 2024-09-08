@@ -41,7 +41,7 @@ prettyPrintMessage indentLevel (msgType, url) =
 calcIndent :: (String, [Int]) -> WebSocketMessage -> (String, [Int])
 calcIndent (prevType, acc) (msgType, _) = 
   if prevType == msgType
-    then (prevType, acc ++ [maximum acc + 1])
+    then (prevType, acc ++ [last acc + 1])
     else (msgType, acc ++ [0])
 
 
@@ -60,7 +60,8 @@ calcIndent (prevType, acc) (msgType, _) =
 -- [0]
 calculateIndents :: [WebSocketMessage] -> [Int]
 calculateIndents [] = []
-calculateIndents (headMsg:restMsg) = snd $ foldl calcIndent (fst headMsg, [0]) restMsg
+--                                               |fn        |input head|       |rest of the list to be processed
+calculateIndents (headMsg:restMsg) = snd $ foldl calcIndent (fst headMsg, [0]) restMsg 
 
 
 
@@ -70,7 +71,12 @@ calculateIndents (headMsg:restMsg) = snd $ foldl calcIndent (fst headMsg, [0]) r
 -- >>> formatOutput exampleMessages
 -- "type: GET\nlink: /index.html\n----\n  type: GET\n  link: /hello/world\n  ----\n    type: GET\n    link: /\n    ----\ntype: POST\nlink: /submit\n----\ntype: GET\nlink: /contact\n----\n  type: GET\n  link: /about\n  ----\ntype: POST\nlink: /login\n----\n  type: POST\n  link: /logout\n  ----"
 formatOutput :: [WebSocketMessage] -> String
-formatOutput = undefined
+formatOutput [] = []
+formatOutput messages =
+  let indents = calculateIndents messages -- indents list
+      formattedMessages = zipWith prettyPrintMessage indents messages -- combines indents list with messages list and then parses it into format messages functions
+  in unlines formattedMessages
+
 
 -- Example usage
 exampleMessages :: [WebSocketMessage]
