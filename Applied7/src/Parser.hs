@@ -103,8 +103,7 @@ string expected input =
 -- >>> parseGET "POST /index.html HTTP/1.1"
 -- Nothing
 parseGET :: String -> Maybe (String, String)
-parse Nothing = Nothing
-parseGET s = string "GET" s
+parseGET = string "GET"
 
 -- | Parse whitespace function checks if the input string starts with either a space (' ') or a tab ('\t').
 -- If it does, it removes all of the leading whitespace and returns the rest of the string inside a `Just`.

@@ -16,7 +16,6 @@
 -- By convention, a polymorphic type is called `a`, but any (lower case)
 -- letter would work.
 module Examples () where
-import Control.Arrow (Arrow(first))
 
 -- \$setup
 
@@ -54,8 +53,9 @@ anyOdd arr = [] /= filter odd arr
 -- >>> sumTwoLists [1,2,3,4,5] [1,2,3,4,5]
 -- [2,4,6,8,10]
 sumTwoLists :: [Integer] -> [Integer] -> [Integer]
-sumTwoLists [] [] = []
-sumTwoLists (x:xs) (y:ys) = (x + y) : sumTwoLists xs ys
+-- sumTwoLists [] [] = []
+-- sumTwoLists (x:xs) (y:ys) = (x + y) : sumTwoLists xs ys
+sumTwoLists = zipWith (+)
 
 -- | Function to get first item in a list of tuples
 --
