@@ -67,4 +67,3 @@ liftA2 f a b = fmap f a  <*> b
 -- /Hint/: you'll need to lift a binary function that returns the first argument regardless of its second argument into the applicative context
 (<*) :: Applicative f => f a -> f b -> f a
 (<*) = liftA2 const 
-

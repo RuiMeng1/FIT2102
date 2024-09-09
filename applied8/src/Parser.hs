@@ -42,7 +42,7 @@ newtype Parser a = Parser (String -> Maybe (String, a))
 -- >>> parse (Parser f) "abc"
 -- Just ("","abc")
 parse :: Parser a -> (String -> Maybe (String, a))
-parse (Parser p) input = undefined
+parse (Parser p)  = p 
 
 -- | Parse a single character
 --
@@ -54,8 +54,8 @@ parse (Parser p) input = undefined
 char :: Parser Char
 char = Parser f
   where
-    f ""       = undefined
-    f (x : xs) = undefined
+    f ""       = empty
+    f (x : xs) = pure (xs, x)
 
 -- | Parse numbers as int until non-digit
 --
@@ -79,7 +79,12 @@ int = Parser f
 -- >>> parse (is 'c') "abc"
 -- Nothing
 is :: Char -> Parser Char
-is c = undefined
+is c = Parser f
+  where
+    f "" = Nothing
+    f (x:xs)
+      | x == c = pure (xs,x)
+      | otherwise = Nothing
 
 -- | Parses not a specific character, otherwise return Nothing
 --
@@ -88,14 +93,18 @@ is c = undefined
 -- >>> parse (isNot 'c') "abc"
 -- Just ("bc",'a')
 isNot :: Char -> Parser Char
-isNot c = undefined
+isNot c = Parser f
+  where
+    f "" = Nothing
+    f (x:xs)
+      | x == c = Nothing
+      | otherwise = pure (xs, x)
 
 
 -- | Applies the mapping function to the *result* (parsed value) of the parser.
 --
 -- see https://tgdwyer.github.io/haskell3/#functor
 --
--- /Hint/: We need to "thread" the mapping function through the return
 --  value of the parsing function Maybe (String, a)
 --
 -- /Hint 2/: You will have to manually construct a parsing function and parser.
@@ -128,16 +137,27 @@ isNot c = undefined
 --   /Hint/: Can we make use of the functor instances for these types?
 --    What does fmap do for each of these types?
 --
---   /Hint 2/: Using fmap dGhyZWUgbGF5ZXJzIG9mIGZ1bmN0b3JzLCB0aHJlZSBmbWFwcz8=
+--   /Hint 2/: Using fmap =>  three layers of functors, three fmaps?
 --
 -- /End Challenge/:
 --
 -- >>> import Data.Char (toUpper)
 -- >>> parse (toUpper <$> char) "abc"
 -- Just ("bc",'A')
+-- >>> parse (fmap toUpper char) "abc"
+
+-- >>> char "abc"
+--- Just ("bc", 'a')
+
+-- data Parser a = Parser (String -> Maybe (String, a))
+
 instance Functor Parser where
   fmap :: (a -> b) -> Parser a -> Parser b
-  fmap f (Parser p) = undefined
+  fmap f (Parser p) = Parser $ 
+    \input -> 
+      case  p input  of
+           Nothing -> Nothing 
+           (Just (str, a)) -> Just (str, f a)
 
 -- |
 --
@@ -169,10 +189,14 @@ instance Applicative Parser where
   -- Returns a parser that always succeeds with the given value,
   -- ignoring the input.
   pure :: a -> Parser a
-  pure a = Parser undefined
+  pure a = Parser $ \x -> Just (x, a)
 
   (<*>) :: Parser (a -> b) -> Parser a -> Parser b
-  p1@(Parser a) <*> p2@(Parser b) = undefined
+  p1@(Parser a) <*> p2@(Parser b) = Parser $ 
+    \input ->
+      case a input of
+        Nothing -> Nothing
+        Just (str, f) -> parse (f <$> p2) str
 
 -- |
 --
