@@ -218,13 +218,18 @@ instance Applicative Parser where
 --
 -- >>> parse (int <|> empty) "world"
 -- Nothing
+
+-- newtype Parser a = Parser (String -> Maybe (String, a)) REMEMBER
 instance Alternative Parser where
   empty :: Parser a
-  empty = undefined
+  empty = Parser $ const Nothing -- This function always returns nothing (first arg)
 
   (<|>) :: Parser a -> Parser a -> Parser a
-  (<|>) = undefined
-
+  (<|>) p1@(Parser a) p2@(Parser b) = Parser $
+    \input -> 
+      case a input of
+        Nothing -> b input
+        Just (str, f)  -> Just (str, f) -- can also just do success -> success as we know anything output that isn't Nothing means it parsed successfully
 
 -- | Recursively parse a string
 --  If the string is non-empty ((x:xs)), you need to parse the first character (x) and then continue parsing the rest of the string (xs).
