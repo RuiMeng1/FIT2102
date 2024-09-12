@@ -19,7 +19,7 @@ module Parser
 where
 
 -- You may add more imports as you wish/need
-import           Control.Applicative (Alternative (empty, many, (<|>)),
+import           Control.Applicative (Alternative (empty, many, (<|>), some),
                                       Applicative (liftA2))
 
 -- $setup
@@ -235,7 +235,7 @@ instance Alternative Parser where
 --  If the string is non-empty ((x:xs)), you need to parse the first character (x) and then continue parsing the rest of the string (xs).
 --  You will need to accumulate the parsed characters into a list.
 --  For that, consider how you can prepend (:) the parsed character to the result of the recursive string xs call.
--- /Spoiler/: KDopIDwkPiBjaGFyIHggPz8/Pw==
+-- /Spoiler/: (:) <$> char x ????
 -- >>> parse (string "abc") "abcdef"
 -- Just ("def","abc")
 -- >>> parse (string "abc") "abxdef"
@@ -244,7 +244,7 @@ instance Alternative Parser where
 -- Just ("anyinput","")
 string :: String -> Parser String
 string ""     = pure ""
-string (x:xs) = undefined
+string (x:xs) = (:) <$> is x <*> string xs 
 
 -- | Parse one or more spaces
 --
@@ -260,8 +260,9 @@ string (x:xs) = undefined
 -- >>> parse whitespace ""
 -- Just ("","")
 whitespace :: Parser String
-whitespace = undefined
-
+whitespace = some (is ' ') <|> pure ""
+-- whitespace is very similar to many v but instead of return empty list it returns empty string when failed
+-- many v = some v <|> pure []
 
 -- | Parse a URL-like string until a space is encountered
 --
@@ -275,8 +276,9 @@ whitespace = undefined
 -- Just (" POST","my-url")
 -- >>> parse parseURL "invalid_url"
 -- Just ("","invalid_url")
-parseURL :: Parser String
-parseURL = undefined
+parseURL :: Parser (String, String)
+parseURL = (,) <$> many (isNot ' ') <*> (whitespace *> pure "")
+
 
 -- | Parse either "GET" or "POST"
 --
@@ -292,13 +294,12 @@ parseURL = undefined
 -- >>> parse getOrPost "post /lowercase"
 -- Nothing
 getOrPost :: Parser String
-getOrPost = undefined
+getOrPost = (string "GET" <|> string "POST")
 
 
 -- | Parse a tuple of integers
 -- >>> parse parseIntTuple "(3,5)"
--- Just ("",(3,5))
--- >>> parse parseIntTuple "(33,5)"
+-- Just ("",(3,5))   
 -- Just ("",(33,5))
 -- >>> parse parseIntTuple "(33,5,4)"
 -- Nothing
