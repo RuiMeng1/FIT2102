@@ -178,7 +178,7 @@ sepBy1 a b = a <:> many (b *> a)
 -- Just ("","")
 -- >>> parse ((isTok 'a') `sepBy` commaTok) "a"
 -- Just ("","a")
--- >>> parse ((isTok 'a') `sepBy` commaTok) "a,a"
+-- >>> parse ((isTok 'a') `sepBy` commaT›
 -- Just ("","aa")
 -- >>> parse ((tok int) `sepBy` commaTok) "1,2,3"
 -- Just ("",[1,2,3])
@@ -200,7 +200,7 @@ sepBy a b = sepBy1 a b <|> pure []
 -- >>> parse quoteString "\"\\abc\"def"
 -- Just ("def","\\abc")
 quoteString :: Parser String
-quoteString = is '\' *>
+quoteString = is '\"' *> many (isNot '\"') <* is '\"'
 
 -- | Parse a JSON string. Handle double-quotes.
 --
