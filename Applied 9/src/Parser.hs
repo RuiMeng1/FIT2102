@@ -24,12 +24,9 @@ module Parser
   )
 where
 
-import           Control.Applicative (Alternative (many, some, (<|>)),
-                                      Applicative (liftA2))
-import           Control.Monad       (replicateM)
+import           Control.Applicative (Alternative (many, some))
 import           Data.Char           (isSpace)
-import           Data.Functor        (($>))
-import           Instances           (Parser (..), int, parse)
+import           Instances           (Parser (..), parse)
 
 -- | Parse a single character
 char :: Parser Char
