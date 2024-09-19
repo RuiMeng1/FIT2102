@@ -21,7 +21,7 @@ import           Parser              (is, isNot, spaces, string)
 -- >>> parse parseURL "invalid_url"
 -- Just ("","invalid_url")
 parseURL :: Parser String
-parseURL = undefined
+parseURL = many $ isNot ' '
 
 -- | Parse either "GET" or "POST"
 --
@@ -37,7 +37,7 @@ parseURL = undefined
 -- >>> parse getOrPost "post /lowercase"
 -- Nothing
 getOrPost :: Parser String
-getOrPost = undefined
+getOrPost = string "GET" <|> string "POST"
 
 -- | Parse an HTTP request, with optional arguments as JSON.
 -- Consuming any trailing whitespace
@@ -49,4 +49,6 @@ getOrPost = undefined
 -- >>> parse parseHTTPRequest "GET /index.html HTTP/1.1"
 -- Just ("",("GET","/index.html",JNull))
 parseHTTPRequest :: Parser (String, String, JsonValue)
-parseHTTPRequest = undefined
+parseHTTPRequest =  (,,)    <$> (getOrPost <* spaces)
+                            <*> (many(isNot ' ') <* spaces)
+                            <*> ((json <|> pure JNull) <* many(many(isNot ' ') <|> spaces))

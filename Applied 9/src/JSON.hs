@@ -21,7 +21,7 @@ module JSON (json, sepBy, JsonValue (JNull), tok, stringTok) where
 import           Control.Applicative (Alternative (many, (<|>)),
                                       Applicative (liftA2))
 import           Data.Foldable       (asum)
-import           Instances           (Parser (..), int)
+import           Instances           (Parser (..), int, parse)
 import           Parser              (is, isNot, spaces, string)
 
 type KeyVal = (String, JsonValue)
