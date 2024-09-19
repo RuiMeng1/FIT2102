@@ -262,10 +262,15 @@ jsonArray = JArray <$> (isTok '[' *> (jsonValue `sepBy` commaTok) <* isTok ']') 
 -- >>> parse jsonObject "{ \"key1\" : true , \"key2\" : false } xyz"
 -- Just ("xyz",JObject [("key1",JTrue),("key2",JFalse)])
 jsonObject :: Parser JsonValue
+-- parse {
+-- parse everything between until }
+-- parse }
+-- try parsing everything after as string
 jsonObject = undefined
-  where
-    kv :: Parser (String, JsonValue)
-    kv = undefined
+  -- is '{' *> kv <* isNot '{'
+  -- where
+  --   kv :: Parser (String, JsonValue)
+  --   kv = undefined
 
 
 
@@ -284,7 +289,7 @@ jsonObject = undefined
 -- >>> parse jsonVal "null"
 -- Just ("",JNull)
 jsonVal :: Parser JsonValue
-jsonVal = undefined
+jsonVal = jsonBool <|> jsonInteger <|> jsonString <|> jsonNull
 
 -- | Parse a JSON container, either an array or an object.
 --
