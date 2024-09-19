@@ -216,8 +216,7 @@ quoteString = is '\"' *> many (isNot '\"') <* is '\"'
 -- >>> parse jsonString "\"\\abc\"def"
 -- Just ("def",JString "\\abc")
 jsonString :: Parser JsonValue
-jsonString = undefined
-
+jsonString = JString <$> quoteString 
 -- | Parse a JSON array.
 --
 -- /Hint/: Remember the type [JsonValue] means a list of JsonValues, and the
@@ -236,8 +235,13 @@ jsonString = undefined
 --
 -- >>> parse jsonArray "[true, 5, []]"
 -- Just ("",JArray [JTrue,JInteger 5,JArray []])
+
+-- | Parse a JSON array.
 jsonArray :: Parser JsonValue
-jsonArray = undefined
+jsonArray = JArray <$> (isTok '[' *> (jsonValue `sepBy` commaTok) <* isTok ']') -- the centre seperates the objects inside by commas and tries to parse a JSON value for each
+  where
+    jsonValue :: Parser JsonValue -- tries parsing until one works
+    jsonValue = tok (asum [jsonNull, jsonBool, jsonString, jsonInteger, jsonArray]) -- recursive when it parses another array
 
 -- | Parse a JSON object.
 --
