@@ -200,7 +200,7 @@ sepBy a b = sepBy1 a b <|> pure []
 -- >>> parse quoteString "\"\\abc\"def"
 -- Just ("def","\\abc")
 quoteString :: Parser String
-quoteString = is '\"' *> many (isNot '\"') <* is '\"'
+quoteString = is '\"' *> many (isNot '\"') <* is '\"' <* spaces
 
 -- | Parse a JSON string. Handle double-quotes.
 --
@@ -217,6 +217,12 @@ quoteString = is '\"' *> many (isNot '\"') <* is '\"'
 -- Just ("def",JString "\\abc")
 jsonString :: Parser JsonValue
 jsonString = JString <$> quoteString 
+
+-- Parses jsonValue
+jsonValue :: Parser JsonValue -- tries parsing a jsonValue
+jsonValue = tok (asum [jsonNull, jsonBool, jsonString, jsonInteger, jsonArray, jsonObject]) -- recursive when it parses another array or object
+
+
 -- | Parse a JSON array.
 --
 -- /Hint/: Remember the type [JsonValue] means a list of JsonValues, and the
@@ -239,9 +245,10 @@ jsonString = JString <$> quoteString
 -- | Parse a JSON array.
 jsonArray :: Parser JsonValue
 jsonArray = JArray <$> (isTok '[' *> (jsonValue `sepBy` commaTok) <* isTok ']') -- the centre seperates the objects inside by commas and tries to parse a JSON value for each
-  where
-    jsonValue :: Parser JsonValue -- tries parsing until one works
-    jsonValue = tok (asum [jsonNull, jsonBool, jsonString, jsonInteger, jsonArray]) -- recursive when it parses another array
+
+-- | parses ':'
+colonTok:: Parser Char
+colonTok = is ':' <* spaces
 
 -- | Parse a JSON object.
 --
@@ -261,16 +268,19 @@ jsonArray = JArray <$> (isTok '[' *> (jsonValue `sepBy` commaTok) <* isTok ']') 
 --
 -- >>> parse jsonObject "{ \"key1\" : true , \"key2\" : false } xyz"
 -- Just ("xyz",JObject [("key1",JTrue),("key2",JFalse)])
+
+-- | Parse a JSON object.
+
+
 jsonObject :: Parser JsonValue
--- parse {
--- parse everything between until }
--- parse }
--- try parsing everything after as string
-jsonObject = undefined
-  -- is '{' *> kv <* isNot '{'
-  -- where
-  --   kv :: Parser (String, JsonValue)
-  --   kv = undefined
+jsonObject = JObject <$>  (isTok '{' *> (keyVal `sepBy` commaTok) <* isTok '}')
+  where
+    -- input for keyVal is:
+    -- "\"key1\"" and "true"
+    keyVal = (,) <$> (quoteString <* colonTok) <*> jsonValue
+    -- NOTE: i had to remodify quoteString to remove any spaces at the end as it was causing parsing error
+
+
 
 
 
@@ -316,4 +326,4 @@ jsonContainer = jsonArray <|> jsonObject
 -- >>> parse json "{ \"key1\" : true , \"key2\" : [7, false] , \"key3\" : { \"key4\" : null } }"
 -- Just ("",JObject [("key1",JTrue),("key2",JArray [JInteger 7,JFalse]),("key3",JObject [("key4",JNull)])])
 json :: Parser JsonValue
-json = undefined
+json = jsonVal <|> jsonContainer
