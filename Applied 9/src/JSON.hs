@@ -299,7 +299,7 @@ jsonVal = jsonBool <|> jsonInteger <|> jsonString <|> jsonNull
 -- >>> parse jsonContainer "{ \"key1\" : true , \"key2\" : false } xyz"
 -- Just ("xyz",JObject [("key1",JTrue),("key2",JFalse)])
 jsonContainer :: Parser JsonValue
-jsonContainer = undefined
+jsonContainer = jsonArray <|> jsonObject
 
 -- | Parse a JSON string.
 --
