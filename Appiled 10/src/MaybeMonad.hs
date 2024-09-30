@@ -1,4 +1,6 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Redundant lambda" #-}
 module MaybeMonad where
 
 
@@ -68,7 +70,11 @@ instance Monad Maybe where
 -- >>> calculateResult (Just 7) (Just (-3))
 -- Just 4
 calculateResult :: Maybe Int -> Maybe Int -> Maybe Int
-calculateResult = undefined
+calculateResult = \a b -> case a of
+  Just x -> case b of
+    Just y -> Just $ x + y
+    Nothing -> Nothing
+  Nothing -> Nothing
 
 
 -- | This function is the same as previous, but uses the `>>=` (bind) operator to handle the unwrapping of `Maybe` values
