@@ -39,10 +39,12 @@ import Control.Applicative (Applicative(liftA2))
 
 instance Monad Maybe where
   return :: a -> Maybe a
-  return = undefined
+  return = Just 
 
   (>>=) :: Maybe a -> (a -> Maybe b) -> Maybe b
-  (>>=) = undefined
+  (Just x) >>= k = k x
+  Nothing >>= k = Nothing
+
 
 -- | The `calculateResult` function adds two `Maybe Int` values.
 --   If either value is `Nothing`, the result is `Nothing`.
