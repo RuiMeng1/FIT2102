@@ -50,5 +50,5 @@ getOrPost = string "GET" <|> string "POST"
 -- Just ("",("GET","/index.html",JNull))
 parseHTTPRequest :: Parser (String, String, JsonValue)
 parseHTTPRequest =  (,,)    <$> (getOrPost <* spaces)
-                            <*> (many(isNot ' ') <* spaces)
-                            <*> ((json <|> pure JNull) <* many(many(isNot ' ') <|> spaces))
+                            <*> (parseURL <* spaces <* stringTok "HTTP/1.1" <* spaces)
+                            <*> (json <|> pure JNull) <* spaces

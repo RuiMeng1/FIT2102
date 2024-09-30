@@ -176,10 +176,15 @@ sepBy1 a b = a <:> many (b *> a)
 --
 -- >>> parse ((isTok 'a') `sepBy` commaTok) ""
 -- Just ("","")
+--
 -- >>> parse ((isTok 'a') `sepBy` commaTok) "a"
 -- Just ("","a")
+--
 -- >>> parse ((isTok 'a') `sepBy` commaTok) "a,a"
 -- Just ("","aa")
+--
+-- >>> parse ((tok int) `sepBy` commaTok) "1,2,3"
+-- Just ("",[1,2,3])
 
 sepBy :: Parser a -> Parser b -> Parser [a]
 sepBy a b = sepBy1 a b <|> pure []
