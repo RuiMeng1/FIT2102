@@ -7,6 +7,7 @@ module MaybeMonad where
 import           Maybe   (Maybe (..))
 import           Prelude hiding (Just, Maybe, Nothing)
 import Control.Applicative (Applicative(liftA2))
+import GHC.Natural (xorNatural)
 
 -- | The `return` function should wrap a value in a `Just`.
 --
@@ -41,7 +42,7 @@ import Control.Applicative (Applicative(liftA2))
 
 instance Monad Maybe where
   return :: a -> Maybe a
-  return = Just 
+  return = Just
 
   (>>=) :: Maybe a -> (a -> Maybe b) -> Maybe b
   (Just x) >>= k = k x
@@ -97,7 +98,7 @@ calculateResult = \a b -> case a of
 -- >>> calculateResult' (Just 7) (Just (-3))
 -- Just 4
 calculateResult' :: Maybe Int -> Maybe Int -> Maybe Int
-calculateResult' = undefined
+calculateResult' a b = a >>= \x -> b >>= \y -> Just (x + y)
 
 -- | This function is the same as previous, but use do notation to handle the unwrapping of `Maybe` values
 -- and the potential short-circuiting when encountering a `Nothing`.
@@ -120,4 +121,10 @@ calculateResult' = undefined
 -- Just 4
 
 calculateResult''  :: Maybe Int -> Maybe Int -> Maybe Int
-calculateResult'' = undefined
+calculateResult'' a b = do
+  i1 <- a
+  i2 <- b
+  pure $ i1 + i2
+
+
+  
